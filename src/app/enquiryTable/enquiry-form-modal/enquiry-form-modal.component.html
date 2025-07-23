@@ -1,0 +1,289 @@
+<!-- Modal Backdrop -->
+<div class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full z-50" (click)="close()">
+  <!-- Modal Content -->
+  <div class="relative top-10 mx-auto p-8 w-[800px] shadow-2xl rounded-xl bg-white" (click)="$event.stopPropagation()">
+    <div class="flex flex-col gap-6">
+      <!-- Header -->
+      <div class="flex justify-between items-center pb-4 mb-2 border-b border-gray-200">
+        <div>
+          <h3 class="text-2xl font-bold text-gray-900">{{ getModalTitle() }}</h3>
+          <p class="mt-1 text-sm text-gray-500">{{ getModalSubtitle() }}</p>
+        </div>
+        <button 
+          class="text-gray-400 hover:text-gray-500 hover:bg-gray-100 p-2 rounded-full transition-colors duration-200" 
+          (click)="close()"
+        >
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="enquiryForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Enquiry Details -->
+        <div class="grid grid-cols-2 gap-6">
+          <!-- Customer -->
+          <div class="form-group">
+            <label for="customerId" class="form-label block text-sm font-medium text-gray-700 mb-1">Customer</label>
+            <div class="relative rounded-lg shadow-sm">
+              <input
+                type="text"
+                id="customerId"
+                formControlName="customerId"
+                class="form-input block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white"
+                [class.error]="isFieldInvalid(enquiryForm, 'customerId')"
+                [readonly]="mode === 'edit' || mode === 'view'"
+                [class.cursor-not-allowed]="mode === 'edit' || mode === 'view'"
+                [class.opacity-75]="mode === 'edit' || mode === 'view'"
+                placeholder="Enter customer name"
+              />
+            </div>
+            <p *ngIf="isFieldInvalid(enquiryForm, 'customerId')" class="mt-2 text-sm text-red-600">
+              Customer name is required and must be at least 3 characters
+            </p>
+          </div>
+
+          <!-- Enquiry Date & Time -->
+          <div class="form-group">
+            <label for="enquiryDateTime" class="form-label block text-sm font-medium text-gray-700 mb-1">Enquiry Date & Time</label>
+            <div class="relative rounded-lg shadow-sm">
+              <input
+                type="datetime-local"
+                id="enquiryDateTime"
+                formControlName="enquiryDateTime"
+                class="form-input block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white"
+                [class.error]="isFieldInvalid(enquiryForm, 'enquiryDateTime')"
+                [readonly]="mode === 'view'"
+              />
+            </div>
+            <p *ngIf="isFieldInvalid(enquiryForm, 'enquiryDateTime')" class="mt-2 text-sm text-red-600">
+              Date and time is required
+            </p>
+          </div>
+
+          <!-- Status -->
+          <div class="form-group">
+            <label for="status" class="form-label block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <div class="relative rounded-lg shadow-sm">
+              <select
+                id="status"
+                formControlName="status"
+                class="form-input block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white"
+                [class.error]="isFieldInvalid(enquiryForm, 'status')"
+                [attr.disabled]="mode === 'view'"
+              >
+                <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+              </select>
+            </div>
+            <p *ngIf="isFieldInvalid(enquiryForm, 'status')" class="mt-2 text-sm text-red-600">
+              Status is required
+            </p>
+          </div>
+        </div>
+
+        <!-- Products Section -->
+        <div class="space-y-4" formArrayName="products">
+          <div class="flex justify-between items-center">
+            <h4 class="text-lg font-medium text-gray-900">Products</h4>
+            <button
+              type="button"
+              *ngIf="mode !== 'view'"
+              (click)="addProduct()"
+              class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Add Product
+            </button>
+          </div>
+
+          <div *ngIf="productsFormArray.controls.length === 0" class="text-center py-4 text-gray-500">
+            No products added. Click "Add Product" to start.
+          </div>
+
+          <div *ngFor="let control of productsFormArray.controls; let i = index" [formGroupName]="i" class="border rounded-lg p-4 space-y-4">
+            <div class="flex justify-between items-start">
+              <h5 class="text-sm font-medium text-gray-700">Product {{ i + 1 }}</h5>
+              <button
+                type="button"
+                *ngIf="mode !== 'view'"
+                (click)="removeProduct(i)"
+                class="text-red-600 hover:text-red-800"
+              >
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Chemical Name -->
+              <div class="form-group">
+                <label class="form-label block text-sm font-medium text-gray-700 mb-1">Chemical Name</label>
+                <textarea
+                  formControlName="chemicalName"
+                  class="form-input block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white resize-y"
+                  [readonly]="mode === 'view'"
+                  rows="3"
+                  placeholder="Enter chemical name"
+                ></textarea>
+              </div>
+
+              <!-- Quantity -->
+              <div class="form-group">
+                <label class="form-label block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                <input
+                  type="number"
+                  formControlName="quantity"
+                  class="form-input block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white"
+                  [class.error]="isFieldInvalid(getProductFormGroup(i), 'quantity')"
+                  [readonly]="mode === 'view'"
+                  min="1"
+                />
+                <p *ngIf="isFieldInvalid(getProductFormGroup(i), 'quantity')" class="mt-2 text-sm text-red-600">
+                  Quantity must be greater than 0
+                </p>
+              </div>
+
+              <!-- Price -->
+              <div class="form-group">
+                <label class="form-label block text-sm font-medium text-gray-700 mb-1">Price</label>
+                <input
+                  type="number"
+                  formControlName="price"
+                  class="form-input block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white"
+                  [class.error]="isFieldInvalid(getProductFormGroup(i), 'price')"
+                  [readonly]="mode === 'view'"
+                  min="0"
+                  step="0.01"
+                />
+                <p *ngIf="isFieldInvalid(getProductFormGroup(i), 'price')" class="mt-2 text-sm text-red-600">
+                  Price must be greater than or equal to 0
+                </p>
+              </div>
+
+              <!-- CAS Number -->
+              <div class="form-group">
+                <label class="form-label block text-sm font-medium text-gray-700 mb-1">CAS Number</label>
+                <input
+                  type="text"
+                  formControlName="casNumber"
+                  class="form-input block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white"
+                  [class.error]="isFieldInvalid(getProductFormGroup(i), 'casNumber')"
+                  [readonly]="mode === 'view'"
+                  placeholder="1234567-89-0"
+                />
+                <p *ngIf="isFieldInvalid(getProductFormGroup(i), 'casNumber')" class="mt-2 text-sm text-red-600">
+                  Invalid CAS number format (XXXXXXX-XX-X)
+                </p>
+              </div>
+
+              <!-- Cat Number -->
+              <div class="form-group">
+                <label class="form-label block text-sm font-medium text-gray-700 mb-1">Cat Number</label>
+                <input
+                  type="text"
+                  formControlName="catNumber"
+                  class="form-input block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white"
+                  [class.error]="isFieldInvalid(getProductFormGroup(i), 'catNumber')"
+                  [readonly]="mode === 'view'"
+                  placeholder="ISP-A123456"
+                />
+                <p *ngIf="isFieldInvalid(getProductFormGroup(i), 'catNumber')" class="mt-2 text-sm text-red-600">
+                  Invalid Cat number format (ISP-{{ '{' }}Alpha{{ '}' }}{{ '{' }}XXXXXX{{ '}' }})
+                </p>
+              </div>
+
+              <!-- Molecular Weight -->
+              <div class="form-group">
+                <label class="form-label block text-sm font-medium text-gray-700 mb-1">Molecular Weight</label>
+                <input
+                  type="number"
+                  formControlName="molecularWeight"
+                  class="form-input block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white"
+                  [class.error]="isFieldInvalid(getProductFormGroup(i), 'molecularWeight')"
+                  [readonly]="mode === 'view'"
+                  min="0"
+                  step="0.001"
+                />
+                <p *ngIf="isFieldInvalid(getProductFormGroup(i), 'molecularWeight')" class="mt-2 text-sm text-red-600">
+                  Molecular weight must be greater than or equal to 0
+                </p>
+              </div>
+
+              <!-- Variant -->
+              <div class="form-group">
+                <label class="form-label block text-sm font-medium text-gray-700 mb-1">Variant</label>
+                <input
+                  type="text"
+                  formControlName="variant"
+                  class="form-input block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white"
+                  [readonly]="mode === 'view'"
+                  placeholder="e.g., 25kg Drum"
+                />
+              </div>
+
+              <!-- Flag -->
+              <div class="form-group">
+                <label class="form-label block text-sm font-medium text-gray-700 mb-1">Flag</label>
+                <select
+                  formControlName="flag"
+                  class="form-input block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white"
+                  [attr.disabled]="mode === 'view'"
+                >
+                  <option *ngFor="let flag of flagOptions" [value]="flag">{{ flag }}</option>
+                </select>
+              </div>
+
+              <!-- Attachment -->
+              <div class="form-group col-span-2">
+                <label class="form-label block text-sm font-medium text-gray-700 mb-1">Attachment</label>
+                <div class="flex items-center gap-2">
+                  <input
+                    type="file"
+                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    [attr.disabled]="mode === 'view'"
+                    (change)="onFileSelected($event, i)"
+                  />
+                  <span *ngIf="getProductFormGroup(i).get('attachmentRef')?.value" class="text-sm text-gray-500">
+                    {{ getProductFormGroup(i).get('attachmentRef')?.value }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end gap-3 pt-6 mt-6 border-t border-gray-200">
+          <button
+            type="button"
+            class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+            (click)="close()"
+          >
+            {{ mode === 'view' ? 'Close' : 'Cancel' }}
+          </button>
+          <button
+            *ngIf="mode === 'view'"
+            type="button"
+            class="inline-flex justify-center items-center px-6 py-2.5 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+            (click)="switchToEdit()"
+          >
+            Edit Enquiry
+          </button>
+          <button
+            *ngIf="mode !== 'view'"
+            type="submit"
+            class="inline-flex justify-center items-center px-6 py-2.5 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            [disabled]="enquiryForm.invalid || isSubmitting"
+          >
+            <svg *ngIf="isSubmitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ getSaveButtonText() }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div> 

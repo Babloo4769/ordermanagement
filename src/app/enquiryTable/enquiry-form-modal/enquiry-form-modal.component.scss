@@ -1,0 +1,40 @@
+:host {
+  --input-height: 3rem;
+  --transition-duration: 200ms;
+}
+
+.form-input {
+  height: var(--input-height);
+  transition: all var(--transition-duration) ease-in-out;
+  @apply px-4 py-2.5 text-base;
+}
+
+.form-input:focus {
+  @apply ring-2 ring-offset-2 ring-blue-500 border-blue-500 transform scale-[1.01];
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5);
+}
+
+.form-input.error {
+  @apply ring-2 ring-red-500 border-red-300;
+}
+
+.form-label {
+  transition: all var(--transition-duration) ease-in-out;
+}
+
+.form-group:focus-within .form-label {
+  @apply text-blue-600 transform -translate-y-1;
+}
+
+select.form-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+input[type="datetime-local"].form-input {
+  min-height: var(--input-height);
+} 

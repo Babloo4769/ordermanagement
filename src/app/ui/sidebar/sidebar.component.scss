@@ -1,0 +1,23 @@
+:host .sidebar{
+  display: block;
+  width: 16rem; /* w-64 */
+  transition: width 0.3s;
+
+  &.collapsed {
+    width: 5rem; /* w-20 */
+  }
+}
+
+.pi {
+  &.text-xl {
+    font-size: 1.25rem;
+  }
+  
+  &.text-2xl {
+    font-size: 1.5rem;
+  }
+}
+
+
+
+
