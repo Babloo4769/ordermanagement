@@ -1,7 +1,19 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Enquiry, EnquiryProduct, EnquiryStatus, FlagEnum } from '@/domain/customer';
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from "@angular/forms";
+import {
+  Enquiry,
+  EnquiryProduct,
+  EnquiryStatus,
+  FlagEnum,
+} from "@/domain/customer";
 
 /**
  * Type definition for modal operation modes
@@ -9,25 +21,29 @@ import { Enquiry, EnquiryProduct, EnquiryStatus, FlagEnum } from '@/domain/custo
  * - edit: Modifying an existing enquiry
  * - view: Viewing enquiry details (read-only)
  */
-export type ModalMode = 'create' | 'edit' | 'view';
+export type ModalMode = "create" | "edit" | "view";
 
 /**
  * Modal component for creating, editing, and viewing enquiries
  * Provides a form interface for managing enquiry data and products
  */
 @Component({
-  selector: 'app-enquiry-form-modal',
+  selector: "app-enquiry-form-modal",
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './enquiry-form-modal.component.html',
-  styleUrls: ['./enquiry-form-modal.component.scss']
+  templateUrl: "./enquiry-form-modal.component.html",
+  styleUrls: ["./enquiry-form-modal.component.scss"],
 })
 export class EnquiryFormModalComponent implements OnInit {
+  /**
+   * Loader for products table
+   */
+  isLoadingProducts = false;
   /**
    * Current operation mode of the modal
    * Determines form behavior and available actions
    */
-  @Input() mode: ModalMode = 'create';
+  @Input() mode: ModalMode = "create";
 
   /**
    * Existing enquiry data for edit/view modes
@@ -43,8 +59,9 @@ export class EnquiryFormModalComponent implements OnInit {
   /**
    * Event emitted when an enquiry should be saved
    * Contains the form data for create/update operations
+   * (Type is 'any' to support custom API payload structure)
    */
-  @Output() saveEnquiry = new EventEmitter<Partial<Enquiry>>();
+  @Output() saveEnquiry = new EventEmitter<any>();
 
   /**
    * Event emitted when the modal mode changes
@@ -66,12 +83,12 @@ export class EnquiryFormModalComponent implements OnInit {
   /**
    * Available status options for enquiries
    */
-  statuses: EnquiryStatus[] = ['Open', 'Processed', 'Closed'];
+  statuses: EnquiryStatus[] = ["Open", "Processed", "Closed"];
 
   /**
    * Available flag options for products
    */
-  flagOptions: FlagEnum[] = ['Y', 'N'];
+  flagOptions: FlagEnum[] = ["Y", "N"];
 
   constructor(private fb: FormBuilder) {}
 
@@ -81,18 +98,21 @@ export class EnquiryFormModalComponent implements OnInit {
    */
   private initializeForm(): FormGroup {
     return this.fb.group({
-      customerId: ['', [Validators.required, Validators.minLength(3)]],
-      enquiryDateTime: ['', Validators.required],
-      status: ['Open', Validators.required],
-      products: this.fb.array([], [Validators.required, Validators.minLength(1)])
+      customerId: ["", [Validators.required, Validators.minLength(3)]],
+      enquiryDateTime: ["", Validators.required],
+      status: ["Open", Validators.required],
+      products: this.fb.array(
+        [],
+        [Validators.required, Validators.minLength(1)]
+      ),
     });
   }
 
   ngOnInit() {
-    if (this.mode === 'create') {
+    if (this.mode === "create") {
       // Set default date and time for new enquiries
       this.enquiryForm.patchValue({
-        enquiryDateTime: new Date().toISOString().slice(0, 16)
+        enquiryDateTime: new Date().toISOString().slice(0, 16),
       });
     }
 
@@ -100,18 +120,20 @@ export class EnquiryFormModalComponent implements OnInit {
       // Populate form with existing enquiry data
       this.enquiryForm.patchValue({
         customerId: this.enquiry.customerName || this.enquiry.customerId,
-        enquiryDateTime: new Date(this.enquiry.enquiryDateTime).toISOString().slice(0, 16),
-        status: this.enquiry.status
+        enquiryDateTime: new Date(this.enquiry.enquiryDateTime)
+          .toISOString()
+          .slice(0, 16),
+        status: this.enquiry.status,
       });
 
       // Add existing products to the form
-      this.enquiry.products.forEach(product => {
+      this.enquiry.products.forEach((product) => {
         this.addProduct(product);
       });
     }
 
     // Disable form in view mode
-    if (this.mode === 'view') {
+    if (this.mode === "view") {
       this.enquiryForm.disable();
     }
   }
@@ -120,7 +142,7 @@ export class EnquiryFormModalComponent implements OnInit {
    * Accessor for the products form array
    */
   get productsFormArray(): FormArray {
-    return this.enquiryForm.get('products') as FormArray;
+    return this.enquiryForm.get("products") as FormArray;
   }
 
   /**
@@ -137,15 +159,24 @@ export class EnquiryFormModalComponent implements OnInit {
    */
   createProductFormGroup(product?: EnquiryProduct): FormGroup {
     return this.fb.group({
-      quantity: [product?.quantity || '', [Validators.required, Validators.min(1)]],
-      chemicalName: [product?.chemicalName || ''],
-      price: [product?.price || '', [Validators.min(0)]],
-      casNumber: [product?.casNumber || '', [Validators.pattern(/^\d{7}-\d{2}-\d$/)]],
-      catNumber: [product?.catNumber || '', [Validators.pattern(/^ISP-[A-Z]\d{6}$/)]],
-      molecularWeight: [product?.molecularWeight || '', [Validators.min(0)]],
-      variant: [product?.variant || ''],
-      flag: [product?.flag || 'N'],
-      attachmentRef: [product?.attachmentRef || '']
+      quantity: [
+        product?.quantity || "",
+        [Validators.required, Validators.min(1)],
+      ],
+      chemicalName: [product?.chemicalName || ""],
+      price: [product?.price || "", [Validators.min(0)]],
+      casNumber: [
+        product?.casNumber || "",
+        [Validators.pattern(/^\d{7}-\d{2}-\d$/)],
+      ],
+      catNumber: [
+        product?.catNumber || "",
+        [Validators.pattern(/^ISP-[A-Z]\d{6}$/)],
+      ],
+      molecularWeight: [product?.molecularWeight || "", [Validators.min(0)]],
+      variant: [product?.variant || ""],
+      flag: [product?.flag || "N"],
+      attachmentRef: [product?.attachmentRef || ""],
     });
   }
 
@@ -170,14 +201,14 @@ export class EnquiryFormModalComponent implements OnInit {
    */
   getModalTitle(): string {
     switch (this.mode) {
-      case 'create':
-        return 'Create Enquiry';
-      case 'edit':
-        return 'Edit Enquiry';
-      case 'view':
-        return 'Enquiry Details';
+      case "create":
+        return "Create Enquiry";
+      case "edit":
+        return "Edit Enquiry";
+      case "view":
+        return "Enquiry Details";
       default:
-        return '';
+        return "";
     }
   }
 
@@ -186,14 +217,14 @@ export class EnquiryFormModalComponent implements OnInit {
    */
   getModalSubtitle(): string {
     switch (this.mode) {
-      case 'create':
-        return 'Fill in the information below to create a new enquiry';
-      case 'edit':
-        return 'Update the enquiry information below';
-      case 'view':
-        return 'View detailed enquiry information';
+      case "create":
+        return "Fill in the information below to create a new enquiry";
+      case "edit":
+        return "Update the enquiry information below";
+      case "view":
+        return "View detailed enquiry information";
       default:
-        return '';
+        return "";
     }
   }
 
@@ -203,16 +234,16 @@ export class EnquiryFormModalComponent implements OnInit {
    */
   getSaveButtonText(): string {
     if (this.isSubmitting) {
-      return 'Saving...';
+      return "Saving...";
     }
-    return this.mode === 'create' ? 'Create Enquiry' : 'Save Changes';
+    return this.mode === "create" ? "Create Enquiry" : "Save Changes";
   }
 
   /**
    * Switches the modal from view to edit mode
    */
   switchToEdit() {
-    this.mode = 'edit';
+    this.mode = "edit";
     this.modeChange.emit(this.mode);
     this.enquiryForm.enable();
   }
@@ -255,16 +286,44 @@ export class EnquiryFormModalComponent implements OnInit {
     if (this.enquiryForm.valid) {
       this.isSubmitting = true;
       const formValue = this.enquiryForm.value;
-      
-      const enquiryData: Partial<Enquiry> = {
-        ...formValue,
-        customerName: formValue.customerId
+
+      // Build attachments array for each product (if any)
+      const attachments = formValue.products
+        .filter((p: any) => p.attachmentRef)
+        .map((p: any) => ({
+          file_name: p.attachmentRef,
+          file_type: "", // You can enhance this to capture file type if needed
+          file_url: `s3://ordermanagement-attachments/temp/${p.attachmentRef}`,
+        }));
+
+      // Build products array in required format
+      const products = formValue.products.map((p: any) => ({
+        cas_number: p.casNumber,
+        cat_number: p.catNumber,
+        chemical_name: p.chemicalName,
+        molecular_weight: p.molecularWeight,
+        price: p.price,
+        product_name: p.chemicalName, // or another field if you have a separate product_name
+        quantity: p.quantity,
+        variant: p.variant,
+      }));
+
+      // Build the emails array as required by backend
+      const payload = {
+        emails: [
+          {
+            attachments,
+            customer_id: formValue.customerId,
+            email_content: "", // You can add a field in your form for this if needed
+            products,
+          },
+        ],
       };
 
-      this.saveEnquiry.emit(enquiryData);
+      this.saveEnquiry.emit(payload);
     } else {
       // Mark all fields as touched to trigger validation messages
-      Object.keys(this.enquiryForm.controls).forEach(key => {
+      Object.keys(this.enquiryForm.controls).forEach((key) => {
         const control = this.enquiryForm.get(key);
         control?.markAsTouched();
       });
@@ -272,7 +331,7 @@ export class EnquiryFormModalComponent implements OnInit {
       // Mark all product form fields as touched
       this.productsFormArray.controls.forEach((control: AbstractControl) => {
         if (control instanceof FormGroup) {
-          Object.keys(control.controls).forEach(key => {
+          Object.keys(control.controls).forEach((key) => {
             const field = control.get(key);
             field?.markAsTouched();
           });
@@ -280,4 +339,4 @@ export class EnquiryFormModalComponent implements OnInit {
       });
     }
   }
-} 
+}

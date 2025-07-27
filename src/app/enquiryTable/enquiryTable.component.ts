@@ -1,11 +1,14 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { EnquiryFormModalComponent, ModalMode } from './enquiry-form-modal/enquiry-form-modal.component';
-import { Enquiry, EnquiryStatus } from '@/domain/customer';
-import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
-import { EnquiryService } from '../service/enquiry.service';
-import { Subscription } from 'rxjs';
+import { Component, OnInit, OnDestroy, inject } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import {
+  EnquiryFormModalComponent,
+  ModalMode,
+} from "./enquiry-form-modal/enquiry-form-modal.component";
+import { Enquiry, EnquiryStatus } from "@/domain/customer";
+import { FormsModule } from "@angular/forms";
+import { DatePipe } from "@angular/common";
+import { EnquiryService } from "../service/enquiry.service";
+import { Subscription } from "rxjs";
 
 /**
  * Main component for displaying and managing enquiries in a table format
@@ -13,38 +16,38 @@ import { Subscription } from 'rxjs';
  * Includes pagination and status filtering capabilities
  */
 @Component({
-  selector: 'app-enquiry-table',
+  selector: "app-enquiry-table",
   standalone: true,
   imports: [CommonModule, EnquiryFormModalComponent, FormsModule, DatePipe],
-  templateUrl: './enquiryTable.component.html'
+  templateUrl: "./enquiryTable.component.html",
 })
 export class EnquiryTableComponent implements OnInit, OnDestroy {
   /** Master list of all enquiries */
   enquiries: Enquiry[] = [];
-  
+
   /** Filtered list of enquiries based on search criteria */
   filteredEnquiries: Enquiry[] = [];
-  
+
   /** Controls visibility of the enquiry modal */
   showModal = false;
-  
+
   /** Current operation mode of the modal (create/edit/view) */
-  modalMode: ModalMode = 'create';
-  
+  modalMode: ModalMode = "create";
+
   /** Currently selected enquiry for edit/view operations */
   selectedEnquiry?: Enquiry;
-  
+
   /** Current search text input value */
-  searchText = '';
-  
+  searchText = "";
+
   /** Collection of all active subscriptions for cleanup */
   private subscription: Subscription = new Subscription();
 
   /** Pagination configuration */
-  currentPage = 1;                          // Current active page
-  pageSize = 10;                           // Number of items per page
-  pageSizeOptions = [5, 10, 25, 50];       // Available page size options
-  totalPages = 0;                          // Total number of pages
+  currentPage = 1; // Current active page
+  pageSize = 10; // Number of items per page
+  pageSizeOptions = [5, 10, 25, 50]; // Available page size options
+  totalPages = 0; // Total number of pages
 
   /** Service for managing enquiry data */
   private enquiryService = inject(EnquiryService);
@@ -69,11 +72,13 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
    */
   private loadEnquiries() {
     this.subscription.add(
-      this.enquiryService.getAllEnquiries().subscribe((enquiries: Enquiry[]) => {
-        this.enquiries = enquiries;
-        this.filteredEnquiries = enquiries;
-        this.updatePagination();
-      })
+      this.enquiryService
+        .getAllEnquiries()
+        .subscribe((enquiries: Enquiry[]) => {
+          this.enquiries = enquiries;
+          this.filteredEnquiries = enquiries;
+          this.updatePagination();
+        })
     );
   }
 
@@ -83,16 +88,17 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
    * @returns String of CSS classes for styling the status badge
    */
   getStatusClass(status: EnquiryStatus): string {
-    const baseClasses = 'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ';
+    const baseClasses =
+      "px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ";
     switch (status) {
-      case 'Open':
-        return baseClasses + 'bg-blue-100 text-blue-800';
-      case 'Processed':
-        return baseClasses + 'bg-yellow-100 text-yellow-800';
-      case 'Closed':
-        return baseClasses + 'bg-green-100 text-green-800';
+      case "Open":
+        return baseClasses + "bg-blue-100 text-blue-800";
+      case "Processed":
+        return baseClasses + "bg-yellow-100 text-yellow-800";
+      case "Closed":
+        return baseClasses + "bg-green-100 text-green-800";
       default:
-        return baseClasses + 'bg-gray-100 text-gray-800';
+        return baseClasses + "bg-gray-100 text-gray-800";
     }
   }
 
@@ -101,7 +107,7 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
    * Resets selected enquiry and sets appropriate mode
    */
   openCreateModal() {
-    this.modalMode = 'create';
+    this.modalMode = "create";
     this.selectedEnquiry = undefined;
     this.showModal = true;
   }
@@ -111,7 +117,7 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
    * @param enquiry Enquiry to view
    */
   viewEnquiry(enquiry: Enquiry) {
-    this.modalMode = 'view';
+    this.modalMode = "view";
     this.selectedEnquiry = { ...enquiry };
     this.showModal = true;
   }
@@ -121,7 +127,7 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
    * @param enquiry Enquiry to edit
    */
   editEnquiry(enquiry: Enquiry) {
-    this.modalMode = 'edit';
+    this.modalMode = "edit";
     this.selectedEnquiry = { ...enquiry };
     this.showModal = true;
   }
@@ -148,24 +154,40 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
    * @param enquiryData Form data from the modal
    */
   saveEnquiry(enquiryData: Partial<Enquiry>) {
-    if (this.modalMode === 'create') {
-      const newEnquiry: Enquiry = {
-        ...enquiryData,
-        enquiryId: parseInt((Math.floor(Math.random() * 90000) + 10000).toString()),
-        customerId: enquiryData.customerId!,
-        customerName: enquiryData.customerName!,
-        enquiryDateTime: enquiryData.enquiryDateTime!,
-        status: enquiryData.status || 'Open',
-        products: enquiryData.products || []
+    if (this.modalMode === "create") {
+      // Prepare customer object from enquiryData (adjust as needed)
+      const customer = {
+        customer_id: "", // Let backend generate or fill if available
+        name: enquiryData.customerName || enquiryData.customerId || "",
+        // Add more fields here if you collect them in the form
       };
-      this.enquiryService.createEnquiry(newEnquiry);
-    } else if (this.modalMode === 'edit' && this.selectedEnquiry) {
+      this.enquiryService
+        .createCustomer(customer)
+        .subscribe((customerRes: any) => {
+          const customer_id =
+            customerRes.customer_id || customerRes.id || customer.customer_id;
+          const newEnquiry = {
+            ...enquiryData,
+            customer_id: customer_id,
+            enquiry_date: enquiryData.enquiryDateTime
+              ? enquiryData.enquiryDateTime.split("T")[0]
+              : "",
+            enquiry_time: enquiryData.enquiryDateTime
+              ? enquiryData.enquiryDateTime.split("T")[1]
+              : "",
+            status: enquiryData.status || "open",
+            products: enquiryData.products || [],
+          };
+          this.enquiryService.createEnquiry(newEnquiry).subscribe(() => {
+            this.loadEnquiries();
+          });
+        });
+    } else if (this.modalMode === "edit" && this.selectedEnquiry) {
       this.enquiryService.updateEnquiry({
         ...this.selectedEnquiry,
-        ...enquiryData
+        ...enquiryData,
       } as Enquiry);
     }
-    
     this.showModal = false;
     this.selectedEnquiry = undefined;
   }
@@ -177,11 +199,13 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
    */
   onSearch(value: string) {
     this.subscription.add(
-      this.enquiryService.searchEnquiries(value).subscribe((results: Enquiry[]) => {
-        this.filteredEnquiries = results;
-        this.currentPage = 1;
-        this.updatePagination();
-      })
+      this.enquiryService
+        .searchEnquiries(value)
+        .subscribe((results: Enquiry[]) => {
+          this.filteredEnquiries = results;
+          this.currentPage = 1;
+          this.updatePagination();
+        })
     );
   }
 
@@ -189,7 +213,7 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
    * Clears search and resets to full enquiry list
    */
   clear() {
-    this.searchText = '';
+    this.searchText = "";
     this.filteredEnquiries = [...this.enquiries];
     this.currentPage = 1;
     this.updatePagination();
@@ -244,7 +268,10 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
   get pageNumbers(): number[] {
     const pages = [];
     const maxVisiblePages = 5;
-    let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+    let startPage = Math.max(
+      1,
+      this.currentPage - Math.floor(maxVisiblePages / 2)
+    );
     let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
 
     if (endPage - startPage + 1 < maxVisiblePages) {
@@ -270,6 +297,9 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
    * @returns Index of last item on current page
    */
   get endIndex(): number {
-    return Math.min(this.currentPage * this.pageSize, this.filteredEnquiries.length);
+    return Math.min(
+      this.currentPage * this.pageSize,
+      this.filteredEnquiries.length
+    );
   }
 }
