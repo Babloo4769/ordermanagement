@@ -131,7 +131,10 @@ export class EnquiryFormModalComponent implements OnInit {
             d.getDate()
           )}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
         })(),
-        status: this.enquiry.status,
+        status: this.enquiry.status
+          ? this.enquiry.status.charAt(0).toUpperCase() +
+            this.enquiry.status.slice(1)
+          : "Open",
       });
 
       // Add existing products to the form
