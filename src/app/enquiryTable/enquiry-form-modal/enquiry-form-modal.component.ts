@@ -14,6 +14,7 @@ import {
   EnquiryStatus,
   FlagEnum,
 } from "@/domain/customer";
+import { EnquiryService } from "@/app/service/enquiry.service";
 
 /**
  * Type definition for modal operation modes
@@ -88,9 +89,12 @@ export class EnquiryFormModalComponent implements OnInit {
   /**
    * Available flag options for products
    */
-  flagOptions: FlagEnum[] = ["Y", "N"];
+  flagOptions: FlagEnum[] = ["y", "N"];
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private enquiryService: EnquiryService
+  ) {}
 
   /**
    * Initializes the form with default values and validation rules
@@ -119,10 +123,14 @@ export class EnquiryFormModalComponent implements OnInit {
     if (this.enquiry) {
       // Populate form with existing enquiry data
       this.enquiryForm.patchValue({
-        customerId: this.enquiry.customerName || this.enquiry.customerId,
-        enquiryDateTime: new Date(this.enquiry.enquiryDateTime)
-          .toISOString()
-          .slice(0, 16),
+        customerId: this.enquiry.customer_id,
+        enquiryDateTime: (() => {
+          const d = new Date(this.enquiry.enquiry_datetime);
+          const pad = (n: number) => n.toString().padStart(2, "0");
+          return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(
+            d.getDate()
+          )}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        })(),
         status: this.enquiry.status,
       });
 
@@ -163,18 +171,19 @@ export class EnquiryFormModalComponent implements OnInit {
         product?.quantity || "",
         [Validators.required, Validators.min(1)],
       ],
-      chemicalName: [product?.chemicalName || ""],
+      chemical_name: [product?.chemical_name || ""],
       price: [product?.price || "", [Validators.min(0)]],
-      casNumber: [
-        product?.casNumber || "",
+      cas_number: [
+        product?.cas_number || "",
         [Validators.pattern(/^\d{7}-\d{2}-\d$/)],
       ],
-      catNumber: [
-        product?.catNumber || "",
+      cat_number: [
+        product?.cat_number || "",
         [Validators.pattern(/^ISP-[A-Z]\d{6}$/)],
       ],
-      molecularWeight: [product?.molecularWeight || "", [Validators.min(0)]],
+      molecular_weight: [product?.molecular_weight || "", [Validators.min(0)]],
       variant: [product?.variant || ""],
+      // If flag and attachmentRef are not in the interface, remove them or add them to the interface
       flag: [product?.flag || "N"],
       attachmentRef: [product?.attachmentRef || ""],
     });
@@ -287,40 +296,50 @@ export class EnquiryFormModalComponent implements OnInit {
       this.isSubmitting = true;
       const formValue = this.enquiryForm.value;
 
-      // Build attachments array for each product (if any)
-      const attachments = formValue.products
-        .filter((p: any) => p.attachmentRef)
-        .map((p: any) => ({
-          file_name: p.attachmentRef,
-          file_type: "", // You can enhance this to capture file type if needed
-          file_url: `s3://ordermanagement-attachments/temp/${p.attachmentRef}`,
-        }));
-
-      // Build products array in required format
-      const products = formValue.products.map((p: any) => ({
-        cas_number: p.casNumber,
-        cat_number: p.catNumber,
-        chemical_name: p.chemicalName,
-        molecular_weight: p.molecularWeight,
-        price: p.price,
-        product_name: p.chemicalName, // or another field if you have a separate product_name
-        quantity: p.quantity,
-        variant: p.variant,
-      }));
-
-      // Build the emails array as required by backend
-      const payload = {
-        emails: [
-          {
-            attachments,
-            customer_id: formValue.customerId,
-            email_content: "", // You can add a field in your form for this if needed
-            products,
-          },
-        ],
+      // Prepare customer object (only name and other required fields)
+      const customer = {
+        name: formValue.name || "",
+        // Add other required customer fields if available in the form
       };
 
-      this.saveEnquiry.emit(payload);
+      // First create the customer, then use the returned customer_id for the enquiry
+      this.enquiryService
+        .createCustomer(customer)
+        .subscribe((customerRes: any) => {
+          const customer_id = customerRes.customer_id || customerRes.id;
+
+          // Build products array in required format (snake_case, with attachment_ref)
+          const products = formValue.products.map((p: any) => ({
+            product_id: p.product_id || "",
+            quantity: p.quantity,
+            chemical_name: p.chemical_name,
+            price: p.price,
+            cas_number: p.cas_number,
+            cat_number: p.cat_number,
+            molecular_weight: p.molecular_weight,
+            variant: p.variant,
+            flag: p.flag,
+            attachment_ref: p.attachmentRef || undefined,
+          }));
+
+          // Build the enquiry payload as required by backend
+          const enquiryPayload = {
+            customer_id,
+            enquiry_date: formValue.enquiryDateTime
+              ? formValue.enquiryDateTime.split("T")[0]
+              : "",
+            enquiry_time: formValue.enquiryDateTime
+              ? formValue.enquiryDateTime.split("T")[1]
+              : "",
+            status: formValue.status,
+            products,
+          };
+
+          // Call createEnquiry with the correct payload
+          this.enquiryService.createEnquiry(enquiryPayload).subscribe((res) => {
+            this.saveEnquiry.emit(res);
+          });
+        });
     } else {
       // Mark all fields as touched to trigger validation messages
       Object.keys(this.enquiryForm.controls).forEach((key) => {

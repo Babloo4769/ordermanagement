@@ -51,22 +51,24 @@ export type EnquiryStatus = "Open" | "Processed" | "Closed";
  * Y: Yes/Active/Available
  * N: No/Inactive/Unavailable
  */
-export type FlagEnum = "Y" | "N";
+export type FlagEnum = "y" | "N";
 
 /**
  * Represents a product in an enquiry
  * Contains all chemical and commercial details of the product
  */
 export interface EnquiryProduct {
-  quantity: number; // Quantity requested by the customer
-  chemicalName?: string; // Chemical compound name
-  price?: number; // Price per unit
-  casNumber?: string; // Chemical Abstracts Service registry number (format: XXXXXXX-XX-X)
-  catNumber?: string; // Catalog number (format: ISP-AXXXXXX)
-  molecularWeight?: number; // Molecular weight in g/mol
-  variant?: string; // Product variant (e.g., "25kg Drum")
-  flag?: FlagEnum; // Product status flag
-  attachmentRef?: string; // Reference to attached documents
+  product_id: string; // Product unique identifier (e.g., 'isp-a123')
+  quantity: number;
+  chemical_name: string;
+  price: number;
+  cas_number: string;
+  cat_number?: string;
+  molecular_weight?: number;
+  variant?: string;
+  flag?: FlagEnum; // Optional flag indicating product status
+  attachmentRef?: string; // Optional reference to an attachment (e.g., image, document)
+  // Add other fields as needed
 }
 
 /**
@@ -74,10 +76,13 @@ export interface EnquiryProduct {
  * Represents a customer's request for products with all related information
  */
 export interface Enquiry {
-  enquiryId: number; // Unique 5-digit identifier for the enquiry
-  customerId: number; // Reference to the customer who made the enquiry
-  customerName: string; // Name of the customer (denormalized for display)
-  enquiryDateTime: string; // Date and time when the enquiry was created
+  enquiry_id: string; // e.g., 'isp02/25/0020'
+  customer_id: string; // e.g., 'cust-001'
+  enquiry_date: string; // e.g., '05-07-2025'
+  enquiry_time: string; // e.g., '05-07-2025'
+  enquiry_datetime: string; // e.g., '2025-07-05T01:11:00'
   status: EnquiryStatus; // Current status of the enquiry
-  products: EnquiryProduct[]; // List of products included in the enquiry
+  customer_name?: string; // Optional customer name for display purposes
+  products: EnquiryProduct[];
+  // Add other fields as needed
 }

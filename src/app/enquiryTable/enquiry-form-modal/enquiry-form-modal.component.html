@@ -201,7 +201,7 @@
                 <div class="col-span-2 flex items-center justify-center">
                   <input
                     type="text"
-                    formControlName="chemicalName"
+                    formControlName="chemical_name"
                     placeholder="Chemical Name"
                     class="form-input w-full text-center px-2 py-1"
                     [readonly]="mode === 'view'"
@@ -232,16 +232,16 @@
                   <div class="w-full">
                     <input
                       type="text"
-                      formControlName="casNumber"
+                      formControlName="cas_number"
                       placeholder="CAS"
                       class="form-input w-full text-center px-2 py-1"
                       [readonly]="mode === 'view'"
                     />
                     <div
                       *ngIf="
-                        getProductFormGroup(i).get('casNumber')?.invalid &&
-                        (getProductFormGroup(i).get('casNumber')?.touched ||
-                          getProductFormGroup(i).get('casNumber')?.dirty)
+                        getProductFormGroup(i).get('cas_number')?.invalid &&
+                        (getProductFormGroup(i).get('cas_number')?.touched ||
+                          getProductFormGroup(i).get('cas_number')?.dirty)
                       "
                       class="text-xs text-red-600 mt-1"
                     >
@@ -253,16 +253,16 @@
                   <div class="w-full">
                     <input
                       type="text"
-                      formControlName="catNumber"
+                      formControlName="cat_number"
                       placeholder="Cat No."
                       class="form-input w-full text-center px-2 py-1"
                       [readonly]="mode === 'view'"
                     />
                     <div
                       *ngIf="
-                        getProductFormGroup(i).get('catNumber')?.invalid &&
-                        (getProductFormGroup(i).get('catNumber')?.touched ||
-                          getProductFormGroup(i).get('catNumber')?.dirty)
+                        getProductFormGroup(i).get('cat_number')?.invalid &&
+                        (getProductFormGroup(i).get('cat_number')?.touched ||
+                          getProductFormGroup(i).get('cat_number')?.dirty)
                       "
                       class="text-xs text-red-600 mt-1"
                     >
@@ -273,7 +273,7 @@
                 <div class="flex items-center justify-center">
                   <input
                     type="number"
-                    formControlName="molecularWeight"
+                    formControlName="molecular_weight"
                     placeholder="Mol Wt"
                     class="form-input w-24 text-center px-2 py-1"
                     [readonly]="mode === 'view'"

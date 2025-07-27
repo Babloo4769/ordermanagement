@@ -1,0 +1,69 @@
+[
+  {
+    "enquiryId": 12345,
+    "customerId": "CUST001",
+    "customerName": "John Smith",
+    "enquiryDateTime": "2024-01-23T10:30:00",
+    "status": "Open",
+    "products": [
+      {
+        "quantity": 100,
+        "chemicalName": "Sodium Chloride",
+        "price": 25.50,
+        "casNumber": "7647-14-5",
+        "catNumber": "ISP-A123456",
+        "molecularWeight": 58.44,
+        "variant": "25kg Drum",
+        "flag": "Y"
+      }
+    ]
+  },
+  {
+    "enquiryId": 23456,
+    "customerId": "CUST002",
+    "customerName": "Sarah Johnson",
+    "enquiryDateTime": "2024-01-22T14:15:00",
+    "status": "Processed",
+    "products": [
+      {
+        "quantity": 50,
+        "chemicalName": "Potassium Hydroxide",
+        "price": 35.75,
+        "casNumber": "1310-58-3",
+        "catNumber": "ISP-B234567",
+        "molecularWeight": 56.11,
+        "variant": "10kg Container",
+        "flag": "N"
+      },
+      {
+        "quantity": 75,
+        "chemicalName": "Hydrochloric Acid",
+        "price": 45.00,
+        "casNumber": "7647-01-0",
+        "catNumber": "ISP-C345678",
+        "molecularWeight": 36.46,
+        "variant": "5L Bottle",
+        "flag": "Y"
+      }
+    ]
+  },
+  {
+    "enquiryId": 34567,
+    "customerId": "CUST003",
+    "customerName": "Michael Brown",
+    "enquiryDateTime": "2024-01-21T09:45:00",
+    "status": "Closed",
+    "products": [
+      {
+        "quantity": 200,
+        "chemicalName": "Sulfuric Acid",
+        "price": 55.25,
+        "casNumber": "7664-93-9",
+        "catNumber": "ISP-D456789",
+        "molecularWeight": 98.08,
+        "variant": "20L Container",
+        "flag": "Y"
+      }
+    ]
+  }
+] 

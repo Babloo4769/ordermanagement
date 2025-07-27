@@ -158,7 +158,6 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
       // Prepare customer object from enquiryData (adjust as needed)
       const customer = {
         customer_id: "", // Let backend generate or fill if available
-        name: enquiryData.customerName || enquiryData.customerId || "",
         // Add more fields here if you collect them in the form
       };
       this.enquiryService
@@ -169,18 +168,17 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
           const newEnquiry = {
             ...enquiryData,
             customer_id: customer_id,
-            enquiry_date: enquiryData.enquiryDateTime
-              ? enquiryData.enquiryDateTime.split("T")[0]
+            enquiry_date: enquiryData.enquiry_datetime
+              ? enquiryData.enquiry_datetime.split("T")[0]
               : "",
-            enquiry_time: enquiryData.enquiryDateTime
-              ? enquiryData.enquiryDateTime.split("T")[1]
+            enquiry_time: enquiryData.enquiry_datetime
+              ? enquiryData.enquiry_datetime.split("T")[1]
               : "",
             status: enquiryData.status || "open",
             products: enquiryData.products || [],
           };
-          this.enquiryService.createEnquiry(newEnquiry).subscribe(() => {
-            this.loadEnquiries();
-          });
+          // Now handled by modal: creation logic moved to modal component
+          this.loadEnquiries();
         });
     } else if (this.modalMode === "edit" && this.selectedEnquiry) {
       this.enquiryService.updateEnquiry({

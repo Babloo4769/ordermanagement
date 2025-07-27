@@ -43,7 +43,7 @@ export class EnquiryService {
    */
   getEnquiryById(id: number): Observable<Enquiry | undefined> {
     return this.getAllEnquiries().pipe(
-      map((enquiries) => enquiries.find((e) => e.enquiryId === id))
+      map((enquiries) => enquiries.find((e) => e.enquiry_id === id.toString()))
     );
   }
 
@@ -72,7 +72,7 @@ export class EnquiryService {
   updateEnquiry(updatedEnquiry: Enquiry): Observable<any> {
     // You may need to adjust the endpoint and payload as per your API
     return this.http.put(
-      `${this.enquiriesApiUrl}${updatedEnquiry.enquiryId}/`,
+      `${this.enquiriesApiUrl}${updatedEnquiry.enquiry_id}/`,
       updatedEnquiry
     );
   }
@@ -89,8 +89,9 @@ export class EnquiryService {
         const term = searchTerm.toLowerCase();
         return enquiries.filter(
           (enquiry) =>
-            enquiry.enquiryId.toString().includes(term) ||
-            enquiry.customerName.toLowerCase().includes(term) ||
+            enquiry.enquiry_id.toString().includes(term) ||
+            (enquiry.customer_id &&
+              enquiry.customer_id.toLowerCase().includes(term)) ||
             enquiry.status.toLowerCase().includes(term)
         );
       })
