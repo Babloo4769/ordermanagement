@@ -22,6 +22,8 @@ import { Subscription } from "rxjs";
   templateUrl: "./enquiryTable.component.html",
 })
 export class EnquiryTableComponent implements OnInit, OnDestroy {
+  /** Loader state for API calls */
+  loading = false;
   /** Master list of all enquiries */
   enquiries: Enquiry[] = [];
 
@@ -71,14 +73,19 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
    * Updates both master and filtered lists
    */
   private loadEnquiries() {
+    this.loading = true;
     this.subscription.add(
-      this.enquiryService
-        .getAllEnquiries()
-        .subscribe((enquiries: Enquiry[]) => {
+      this.enquiryService.getAllEnquiries().subscribe(
+        (enquiries: Enquiry[]) => {
           this.enquiries = enquiries;
           this.filteredEnquiries = enquiries;
           this.updatePagination();
-        })
+          this.loading = false;
+        },
+        () => {
+          this.loading = false;
+        }
+      )
     );
   }
 
