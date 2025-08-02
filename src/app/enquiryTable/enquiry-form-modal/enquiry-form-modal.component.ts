@@ -114,9 +114,14 @@ export class EnquiryFormModalComponent implements OnInit {
 
   ngOnInit() {
     if (this.mode === "create") {
-      // Set default date and time for new enquiries
+      // Set default date and time for new enquiries (local time)
+      const d = new Date();
+      const pad = (n: number) => n.toString().padStart(2, "0");
+      const localDateTime = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(
+        d.getDate()
+      )}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
       this.enquiryForm.patchValue({
-        enquiryDateTime: new Date().toISOString().slice(0, 16),
+        enquiryDateTime: localDateTime,
       });
     }
 
