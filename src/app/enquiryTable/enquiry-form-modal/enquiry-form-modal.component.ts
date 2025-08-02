@@ -102,7 +102,7 @@ export class EnquiryFormModalComponent implements OnInit {
    */
   private initializeForm(): FormGroup {
     return this.fb.group({
-      customerId: ["", [Validators.required, Validators.minLength(3)]],
+      customer_name: ["", [Validators.required, Validators.minLength(3)]],
       enquiryDateTime: ["", Validators.required],
       status: ["Open", Validators.required],
       products: this.fb.array(
@@ -123,7 +123,7 @@ export class EnquiryFormModalComponent implements OnInit {
     if (this.enquiry) {
       // Populate form with existing enquiry data
       this.enquiryForm.patchValue({
-        customerId: this.enquiry.customer_id,
+        customer_name: this.enquiry.customer_name || "",
         enquiryDateTime: (() => {
           const d = new Date(this.enquiry.enquiry_datetime);
           const pad = (n: number) => n.toString().padStart(2, "0");
@@ -301,7 +301,7 @@ export class EnquiryFormModalComponent implements OnInit {
 
       // Prepare customer object (only name and other required fields)
       const customer = {
-        name: formValue.name || "",
+        customer_name: formValue.customer_name || "",
         // Add other required customer fields if available in the form
       };
 

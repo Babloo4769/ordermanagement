@@ -46,17 +46,17 @@
           <!-- Customer -->
           <div class="form-group">
             <label
-              for="customerId"
+              for="customer_name"
               class="form-label block text-sm font-medium text-gray-700 mb-1"
               >Customer</label
             >
             <div class="relative rounded-lg shadow-sm">
               <input
                 type="text"
-                id="customerId"
-                formControlName="customerId"
+                id="customer_name"
+                formControlName="customer_name"
                 class="form-input block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white"
-                [class.error]="isFieldInvalid(enquiryForm, 'customerId')"
+                [class.error]="isFieldInvalid(enquiryForm, 'customer_name')"
                 [readonly]="mode === 'edit' || mode === 'view'"
                 [class.cursor-not-allowed]="mode === 'edit' || mode === 'view'"
                 [class.opacity-75]="mode === 'edit' || mode === 'view'"
@@ -64,7 +64,7 @@
               />
             </div>
             <p
-              *ngIf="isFieldInvalid(enquiryForm, 'customerId')"
+              *ngIf="isFieldInvalid(enquiryForm, 'customer_name')"
               class="mt-2 text-sm text-red-600"
             >
               Customer name is required and must be at least 3 characters
