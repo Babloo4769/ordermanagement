@@ -1,28 +1,4 @@
 <div class="p-6">
-  <!-- Loader -->
-  <div *ngIf="loading" class="flex justify-center items-center py-8">
-    <svg
-      class="animate-spin h-6 w-6 text-blue-600 mr-2"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        class="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        stroke-width="4"
-      ></circle>
-      <path
-        class="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8v8z"
-      ></path>
-    </svg>
-    <span class="text-blue-600 font-medium">Loading enquiries...</span>
-  </div>
   <!-- Header -->
   <div class="flex justify-between items-center mb-6">
     <div class="flex items-center">
@@ -117,7 +93,37 @@
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-        <tr *ngFor="let enquiry of paginatedEnquiries">
+        <tr *ngIf="loading">
+          <td colspan="6" class="text-center py-8">
+            <svg
+              class="animate-spin h-6 w-6 text-blue-600 mr-2 inline"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8z"
+              ></path>
+            </svg>
+            <span class="text-blue-600 font-medium">Loading enquiries...</span>
+          </td>
+        </tr>
+        <tr *ngIf="!loading && paginatedEnquiries.length === 0">
+          <td colspan="6" class="text-center py-8 text-gray-500">
+            No enquiries found.
+          </td>
+        </tr>
+        <tr *ngFor="let enquiry of paginatedEnquiries" [hidden]="loading">
           <td class="px-6 py-4 whitespace-nowrap">
             <div class="text-sm font-medium text-gray-900">
               {{ enquiry.enquiry_id }}

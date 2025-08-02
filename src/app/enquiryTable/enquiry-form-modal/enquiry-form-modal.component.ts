@@ -89,7 +89,7 @@ export class EnquiryFormModalComponent implements OnInit {
   /**
    * Available flag options for products
    */
-  flagOptions: FlagEnum[] = ["y", "N"];
+  flagOptions: FlagEnum[] = ["Y", "N"];
 
   constructor(
     private fb: FormBuilder,

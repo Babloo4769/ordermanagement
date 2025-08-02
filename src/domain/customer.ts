@@ -51,7 +51,7 @@ export type EnquiryStatus = "Open" | "Processed" | "Closed";
  * Y: Yes/Active/Available
  * N: No/Inactive/Unavailable
  */
-export type FlagEnum = "y" | "N";
+export type FlagEnum = "Y" | "N";
 
 /**
  * Represents a product in an enquiry
