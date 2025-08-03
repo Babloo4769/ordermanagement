@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  Renderer2,
+  Inject,
+  OnDestroy,
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
   AbstractControl,
@@ -15,6 +24,7 @@ import {
   FlagEnum,
 } from "@/domain/customer";
 import { EnquiryService } from "@/app/service/enquiry.service";
+import { DOCUMENT } from "@angular/common";
 
 /**
  * Type definition for modal operation modes
@@ -35,7 +45,7 @@ export type ModalMode = "create" | "edit" | "view";
   templateUrl: "./enquiry-form-modal.component.html",
   styleUrls: ["./enquiry-form-modal.component.scss"],
 })
-export class EnquiryFormModalComponent implements OnInit {
+export class EnquiryFormModalComponent implements OnInit, OnDestroy {
   /**
    * Loader for products table
    */
@@ -93,7 +103,9 @@ export class EnquiryFormModalComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private enquiryService: EnquiryService
+    private enquiryService: EnquiryService,
+    private renderer: Renderer2,
+    @Inject(DOCUMENT) private document: Document
   ) {}
 
   /**
@@ -113,6 +125,7 @@ export class EnquiryFormModalComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.renderer.addClass(this.document.body, "overflow-hidden");
     if (this.mode === "create") {
       // Set default date and time for new enquiries (local time)
       const d = new Date();
@@ -152,6 +165,10 @@ export class EnquiryFormModalComponent implements OnInit {
     if (this.mode === "view") {
       this.enquiryForm.disable();
     }
+  }
+
+  ngOnDestroy() {
+    this.renderer.removeClass(this.document.body, "overflow-hidden");
   }
 
   /**

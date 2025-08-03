@@ -181,13 +181,21 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
    */
   onSearch(value: string) {
     const term = value.toLowerCase();
-    this.filteredEnquiries = this.enquiries.filter(
-      (enquiry) =>
-        enquiry.enquiry_id.toString().includes(term) ||
-        (enquiry.customer_name &&
-          enquiry.customer_name.toLowerCase().includes(term)) ||
-        enquiry.status.toLowerCase().includes(term)
-    );
+    this.filteredEnquiries = this.enquiries.filter((enquiry) => {
+      const matchesId = enquiry.enquiry_id.toString().includes(term);
+      const matchesCustomer =
+        enquiry.customer_name &&
+        enquiry.customer_name.toLowerCase().includes(term);
+      const matchesStatus = enquiry.status.toLowerCase().includes(term);
+      const matchesChemical =
+        Array.isArray(enquiry.products) &&
+        enquiry.products.some(
+          (product) =>
+            product.chemical_name &&
+            product.chemical_name.toLowerCase().includes(term)
+        );
+      return matchesId || matchesCustomer || matchesStatus || matchesChemical;
+    });
     this.currentPage = 1;
     this.updatePagination();
   }
