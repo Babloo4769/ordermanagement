@@ -162,31 +162,8 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
    */
   saveEnquiry(enquiryData: Partial<Enquiry>) {
     if (this.modalMode === "create") {
-      // Prepare customer object from enquiryData (adjust as needed)
-      const customer = {
-        customer_id: "", // Let backend generate or fill if available
-        // Add more fields here if you collect them in the form
-      };
-      this.enquiryService
-        .createCustomer(customer)
-        .subscribe((customerRes: any) => {
-          const customer_id =
-            customerRes.customer_id || customerRes.id || customer.customer_id;
-          const newEnquiry = {
-            ...enquiryData,
-            customer_id: customer_id,
-            enquiry_date: enquiryData.enquiry_datetime
-              ? enquiryData.enquiry_datetime.split("T")[0]
-              : "",
-            enquiry_time: enquiryData.enquiry_datetime
-              ? enquiryData.enquiry_datetime.split("T")[1]
-              : "",
-            status: enquiryData.status || "open",
-            products: enquiryData.products || [],
-          };
-          // Now handled by modal: creation logic moved to modal component
-          this.loadEnquiries();
-        });
+      // Creation logic handled by modal; just reload enquiries
+      this.loadEnquiries();
     } else if (this.modalMode === "edit" && this.selectedEnquiry) {
       this.enquiryService.updateEnquiry({
         ...this.selectedEnquiry,
