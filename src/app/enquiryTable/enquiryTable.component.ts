@@ -180,15 +180,16 @@ export class EnquiryTableComponent implements OnInit, OnDestroy {
    * @param value Search term entered by user
    */
   onSearch(value: string) {
-    this.subscription.add(
-      this.enquiryService
-        .searchEnquiries(value)
-        .subscribe((results: Enquiry[]) => {
-          this.filteredEnquiries = results;
-          this.currentPage = 1;
-          this.updatePagination();
-        })
+    const term = value.toLowerCase();
+    this.filteredEnquiries = this.enquiries.filter(
+      (enquiry) =>
+        enquiry.enquiry_id.toString().includes(term) ||
+        (enquiry.customer_name &&
+          enquiry.customer_name.toLowerCase().includes(term)) ||
+        enquiry.status.toLowerCase().includes(term)
     );
+    this.currentPage = 1;
+    this.updatePagination();
   }
 
   /**
